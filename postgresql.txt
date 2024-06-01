@@ -1,0 +1,8 @@
+CREATE TABLE rfid (
+    id SERIAL PRIMARY KEY,
+    rfid VARCHAR(255) NOT NULL,
+    name VARCHAR(255),
+    npm VARCHAR(255),
+    status VARCHAR(4) NOT NULL,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
