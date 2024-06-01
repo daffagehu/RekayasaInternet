@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RFID Attendance System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table, th, td {
+      border: 1px solid black;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .active {
+      background-color: green;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>RFID Attendance System</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>NPM</th>
+        <th>Timestamp</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="rfid-table-body">
+    </tbody>
+  </table>
+  <script>
+    async function fetchRFIDData() {
+      try {
+        const response = await fetch('http://localhost:3000/rfid-data');
+        const data = await response.json();
+        const tbody = document.getElementById('rfid-table-body');
+        tbody.innerHTML = '';
+
+        const rfidStatus = {}; // To track the status of each RFID
+
+        data.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.name}</td>
+            <td>${item.npm}</td>
+            <td>${item.timestamp}</td>
+            <td>${item.status}</td>
+          `;
+
+          if (rfidStatus[item.rfid] === 'IN' && item.status === 'OUT') {
+            rfidStatus[item.rfid] = 'OUT';
+          } else {
+            rfidStatus[item.rfid] = item.status;
+          }
+
+          if (rfidStatus[item.rfid] === 'IN') {
+            row.classList.add('active');
+          }
+
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error fetching RFID data:', error);
+      }
+    }
+
+    // Fetch RFID data initially
+    fetchRFIDData();
+
+    // Polling the server every 5 seconds to update the table
+    setInterval(fetchRFIDData, 5000);
+  </script>
+</body>
+</html>
